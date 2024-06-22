@@ -1,6 +1,7 @@
 module Main (main) where
 
-import Lib
+import Lib ()
 
 main :: IO ()
-main = someFunc
+main = do
+  putStrLn "TEST"

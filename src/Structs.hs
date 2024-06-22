@@ -10,9 +10,9 @@ import GHC.Generics (Generic)
 import InputEvent (InputEvent)
 import StdInt (CU32, CU64, CU8)
 import TetrominoType (TetrominoType)
-import Types (AdditionalInformationPtr)
+import Types (AdditionalInformation)
 
-data TetrionRecord = TetrionRecord
+data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOPetrisTetrionRecord" #-} TetrionRecord = TetrionRecord
   { r_simulation_step_index :: CU64,
     event :: InputEvent,
     r_tetrion_index :: CU8
@@ -31,7 +31,7 @@ instance Storable TetrionRecord where
   peek :: Ptr TetrionRecord -> IO TetrionRecord
   peek = cPeek
 
-data MinoPosition = MinoPosition
+data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOpetrisMinoPosition" #-} MinoPosition = MinoPosition
   { x :: CU8,
     y :: CU8
   }
@@ -49,7 +49,7 @@ instance Storable MinoPosition where
   peek :: Ptr MinoPosition -> IO MinoPosition
   peek = cPeek
 
-data Mino = Mino
+data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOPetrisMino" #-} Mino = Mino
   { position :: MinoPosition,
     _type :: TetrominoType
   }
@@ -67,7 +67,7 @@ instance Storable Mino where
   peek :: Ptr Mino -> IO Mino
   peek = cPeek
 
-data TetrionSnapshot = TetrionSnapshot
+data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOpetrisTetrionSnapshot" #-} TetrionSnapshot = TetrionSnapshot
   { level :: CU32,
     mino_stack :: Ptr Mino,
     score :: CU64,
@@ -89,7 +89,7 @@ instance Storable TetrionSnapshot where
   peek :: Ptr TetrionSnapshot -> IO TetrionSnapshot
   peek = cPeek
 
-data TetrionHeader = TetrionHeader
+data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOPetrisTetrionHeader" #-} TetrionHeader = TetrionHeader
   { seed :: CU64,
     starting_level :: CU32
   }
@@ -107,8 +107,8 @@ instance Storable TetrionHeader where
   peek :: Ptr TetrionHeader -> IO TetrionHeader
   peek = cPeek
 
-data RecordingInformation = RecordingInformation
-  { information :: AdditionalInformationPtr,
+data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOPetrisRecordingInformation" #-} RecordingInformation = RecordingInformation
+  { information :: Ptr AdditionalInformation,
     records :: Ptr TetrionRecord,
     snapshots :: Ptr TetrionSnapshot,
     tetrion_headers :: Ptr TetrionHeader,
@@ -128,7 +128,7 @@ instance Storable RecordingInformation where
   peek :: Ptr RecordingInformation -> IO RecordingInformation
   peek = cPeek
 
-data GridProperties = GridProperties
+data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOPetrisGridProperties" #-} GridProperties = GridProperties
   { height :: CU32,
     width :: CU32
   }

@@ -32,6 +32,8 @@ library
   hs-source-dirs:
       src
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+  pkgconfig-depends:
+      oopetris-c-wrapper
   build-depends:
       base >=4.7 && <5
     , c-storable-deriving >=0.1.3
