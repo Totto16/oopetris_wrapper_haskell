@@ -46,6 +46,14 @@ jobs:
           path: ./oopetris
           submodules: false
   
+      - uses: actions/checkout@v4
+        name: Checkout C Wrapper
+        with:
+          fetch-depth: "0"
+          repository: Totto16/oopetris_wrapper_c
+          ref: main
+          path: ./oopetris_c_wrapper
+          submodules: false
 
       - name: Setup MSVC (Windows)
         if: matrix.config.os == 'windows'
@@ -117,6 +125,25 @@ jobs:
         if: matrix.config.os == 'ubuntu'
         run: |  
           cd oopetris 
+          sudo meson install -C build 
+
+      - name: Build  C Wrapper
+        run: | 
+          cd oopetris_c_wrapper
+          meson setup -Dtests=false -Dexample=false build -Dbuildtype=release -Ddefault_library=static
+          meson compile -C build
+     
+
+      - name: Install C Wrapper
+        if: matrix.config.os != 'ubuntu'
+        run: |  
+          cd oopetris_c_wrapper 
+          meson install -C build 
+
+      - name: Build and install Libs (Linux)
+        if: matrix.config.os == 'ubuntu'
+        run: |  
+          cd oopetris_c_wrapper 
           sudo meson install -C build 
 
       - uses: haskell-actions/setup@v2
