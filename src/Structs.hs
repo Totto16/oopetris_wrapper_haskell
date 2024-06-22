@@ -53,6 +53,14 @@ data AdditionalInformationField
 
 type AdditionalInformation = Map String AdditionalInformationField
 
+-- | This aligns the sizeof, so that it works correctly with the library!!
+cSizeOfPatch :: (CStorable a) => a -> Int
+cSizeOfPatch a = if remainder == 0 then sz else (res + 1) * al
+  where
+    al = cAlignment a
+    sz = cSizeOf a
+    (res, remainder) = sz `divMod` al
+
 data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOPetrisTetrionRecord" #-} TetrionRecordC = TetrionRecordC
   { c_r_simulation_step_index :: CU64,
     c_event :: EnumTypeC,
@@ -71,7 +79,7 @@ instance CStorable TetrionRecordC
 
 instance Storable TetrionRecordC where
   sizeOf :: TetrionRecordC -> Int
-  sizeOf = cSizeOf
+  sizeOf = cSizeOfPatch
   alignment :: TetrionRecordC -> Int
   alignment = cAlignment
   poke :: Ptr TetrionRecordC -> TetrionRecordC -> IO ()
@@ -95,7 +103,7 @@ instance CStorable MinoPositionC
 
 instance Storable MinoPositionC where
   sizeOf :: MinoPositionC -> Int
-  sizeOf = cSizeOf
+  sizeOf = cSizeOfPatch
   alignment :: MinoPositionC -> Int
   alignment = cAlignment
   poke :: Ptr MinoPositionC -> MinoPositionC -> IO ()
@@ -119,7 +127,7 @@ instance CStorable MinoC
 
 instance Storable MinoC where
   sizeOf :: MinoC -> Int
-  sizeOf = cSizeOf
+  sizeOf = cSizeOfPatch
   alignment :: MinoC -> Int
   alignment = cAlignment
   poke :: Ptr MinoC -> MinoC -> IO ()
@@ -151,7 +159,7 @@ instance CStorable TetrionSnapshotC
 
 instance Storable TetrionSnapshotC where
   sizeOf :: TetrionSnapshotC -> Int
-  sizeOf = cSizeOf
+  sizeOf = cSizeOfPatch
   alignment :: TetrionSnapshotC -> Int
   alignment = cAlignment
   poke :: Ptr TetrionSnapshotC -> TetrionSnapshotC -> IO ()
@@ -175,7 +183,7 @@ instance CStorable TetrionHeaderC
 
 instance Storable TetrionHeaderC where
   sizeOf :: TetrionHeaderC -> Int
-  sizeOf = cSizeOf
+  sizeOf = cSizeOfPatch
   alignment :: TetrionHeaderC -> Int
   alignment = cAlignment
   poke :: Ptr TetrionHeaderC -> TetrionHeaderC -> IO ()
@@ -205,7 +213,7 @@ instance CStorable RecordingInformationC
 
 instance Storable RecordingInformationC where
   sizeOf :: RecordingInformationC -> Int
-  sizeOf = cSizeOf
+  sizeOf = cSizeOfPatch
   alignment :: RecordingInformationC -> Int
   alignment = cAlignment
   poke :: Ptr RecordingInformationC -> RecordingInformationC -> IO ()
@@ -229,7 +237,7 @@ instance CStorable GridPropertiesC
 
 instance Storable GridPropertiesC where
   sizeOf :: GridPropertiesC -> Int
-  sizeOf = cSizeOf
+  sizeOf = cSizeOfPatch
   alignment :: GridPropertiesC -> Int
   alignment = cAlignment
   poke :: Ptr GridPropertiesC -> GridPropertiesC -> IO ()
