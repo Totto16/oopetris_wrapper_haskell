@@ -1,147 +1,238 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE InstanceSigs #-}
 
-module Structs (TetrionRecord (..), MinoPosition (..), Mino (..), TetrionSnapshot (..), TetrionHeader (..), RecordingInformation (..), GridProperties (..)) where
+module Structs
+  ( TetrionRecord (..),
+    MinoPosition (..),
+    Mino (..),
+    TetrionSnapshot (..),
+    TetrionHeader (..),
+    RecordingInformation (..),
+    GridProperties (..),
+    RecordingInformationC (..),
+    RecordingReturnValue (..),
+    AdditionalInformationField (..),
+    AdditionalInformation,
+    GridPropertiesC (..),
+    TetrionRecordC (..),
+    MinoPositionC (..),
+    MinoC (..),
+    TetrionSnapshotC (..),
+    TetrionHeaderC (..),
+  )
+where
 
-import Foreign.CStorable
+import Data.HashMap (Map)
+import Data.Int (Int32, Int64, Int8)
+import Data.Word (Word32, Word64, Word8)
+import Foreign.CStorable (CStorable (..))
 import Foreign.Ptr (Ptr)
 import Foreign.Storable (Storable (..))
 import GHC.Generics (Generic)
 import InputEvent (InputEvent)
 import StdInt (CU32, CU64, CU8)
 import TetrominoType (TetrominoType)
-import Types (AdditionalInformation)
+import Types (AdditionalInformationC, EnumTypeC)
 
-data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOPetrisTetrionRecord" #-} TetrionRecord = TetrionRecord
-  { r_simulation_step_index :: CU64,
+data RecordingReturnValue = RecordingReturnSuccess RecordingInformation | RecordingReturnError String
+  deriving (Eq, Show)
+
+data AdditionalInformationField
+  = FieldString String
+  | FieldFloat Float
+  | FieldDouble Double
+  | FieldBool Bool
+  | FieldU8 Word8
+  | FieldI8 Int8
+  | FieldU32 Word32
+  | FieldI32 Int32
+  | FieldU64 Word64
+  | FieldI64 Int64
+  | FieldVector [AdditionalInformationField]
+  deriving (Eq, Show)
+
+type AdditionalInformation = Map String AdditionalInformationField
+
+data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOPetrisTetrionRecord" #-} TetrionRecordC = TetrionRecordC
+  { c_r_simulation_step_index :: CU64,
+    c_event :: EnumTypeC,
+    c_r_tetrion_index :: CU8
+  }
+  deriving (Eq, Show, Generic)
+
+data TetrionRecord = TetrionRecord
+  { r_simulation_step_index :: Word64,
     event :: InputEvent,
-    r_tetrion_index :: CU8
+    r_tetrion_index :: Word8
+  }
+  deriving (Eq, Show)
+
+instance CStorable TetrionRecordC
+
+instance Storable TetrionRecordC where
+  sizeOf :: TetrionRecordC -> Int
+  sizeOf = cSizeOf
+  alignment :: TetrionRecordC -> Int
+  alignment = cAlignment
+  poke :: Ptr TetrionRecordC -> TetrionRecordC -> IO ()
+  poke = cPoke
+  peek :: Ptr TetrionRecordC -> IO TetrionRecordC
+  peek = cPeek
+
+data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOpetrisMinoPosition" #-} MinoPositionC = MinoPositionC
+  { c_x :: CU8,
+    c_y :: CU8
   }
   deriving (Eq, Show, Generic)
 
-instance CStorable TetrionRecord
+data MinoPosition = MinoPosition
+  { x :: Word8,
+    y :: Word8
+  }
+  deriving (Eq, Show)
 
-instance Storable TetrionRecord where
-  sizeOf :: TetrionRecord -> Int
+instance CStorable MinoPositionC
+
+instance Storable MinoPositionC where
+  sizeOf :: MinoPositionC -> Int
   sizeOf = cSizeOf
-  alignment :: TetrionRecord -> Int
+  alignment :: MinoPositionC -> Int
   alignment = cAlignment
-  poke :: Ptr TetrionRecord -> TetrionRecord -> IO ()
+  poke :: Ptr MinoPositionC -> MinoPositionC -> IO ()
   poke = cPoke
-  peek :: Ptr TetrionRecord -> IO TetrionRecord
+  peek :: Ptr MinoPositionC -> IO MinoPositionC
   peek = cPeek
 
-data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOpetrisMinoPosition" #-} MinoPosition = MinoPosition
-  { x :: CU8,
-    y :: CU8
+data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOPetrisMino" #-} MinoC = MinoC
+  { c_position :: MinoPositionC,
+    c_type :: EnumTypeC
   }
   deriving (Eq, Show, Generic)
 
-instance CStorable MinoPosition
-
-instance Storable MinoPosition where
-  sizeOf :: MinoPosition -> Int
-  sizeOf = cSizeOf
-  alignment :: MinoPosition -> Int
-  alignment = cAlignment
-  poke :: Ptr MinoPosition -> MinoPosition -> IO ()
-  poke = cPoke
-  peek :: Ptr MinoPosition -> IO MinoPosition
-  peek = cPeek
-
-data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOPetrisMino" #-} Mino = Mino
+data Mino = Mino
   { position :: MinoPosition,
     _type :: TetrominoType
   }
-  deriving (Eq, Show, Generic)
+  deriving (Eq, Show)
 
-instance CStorable Mino
+instance CStorable MinoC
 
-instance Storable Mino where
-  sizeOf :: Mino -> Int
+instance Storable MinoC where
+  sizeOf :: MinoC -> Int
   sizeOf = cSizeOf
-  alignment :: Mino -> Int
+  alignment :: MinoC -> Int
   alignment = cAlignment
-  poke :: Ptr Mino -> Mino -> IO ()
+  poke :: Ptr MinoC -> MinoC -> IO ()
   poke = cPoke
-  peek :: Ptr Mino -> IO Mino
+  peek :: Ptr MinoC -> IO MinoC
   peek = cPeek
 
-data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOpetrisTetrionSnapshot" #-} TetrionSnapshot = TetrionSnapshot
-  { level :: CU32,
-    mino_stack :: Ptr Mino,
-    score :: CU64,
-    s_simulation_step_index :: CU64,
-    lines_cleared :: CU32,
-    s_tetrion_index :: CU8
+data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOpetrisTetrionSnapshot" #-} TetrionSnapshotC = TetrionSnapshotC
+  { c_level :: CU32,
+    c_mino_stack :: Ptr MinoC,
+    c_score :: CU64,
+    c_s_simulation_step_index :: CU64,
+    c_lines_cleared :: CU32,
+    c_s_tetrion_index :: CU8
   }
   deriving (Eq, Show, Generic)
 
-instance CStorable TetrionSnapshot
+data TetrionSnapshot = TetrionSnapshot
+  { level :: Word32,
+    mino_stack :: [Mino],
+    score :: Word64,
+    s_simulation_step_index :: Word64,
+    lines_cleared :: Word32,
+    s_tetrion_index :: Word8
+  }
+  deriving (Eq, Show)
 
-instance Storable TetrionSnapshot where
-  sizeOf :: TetrionSnapshot -> Int
+instance CStorable TetrionSnapshotC
+
+instance Storable TetrionSnapshotC where
+  sizeOf :: TetrionSnapshotC -> Int
   sizeOf = cSizeOf
-  alignment :: TetrionSnapshot -> Int
+  alignment :: TetrionSnapshotC -> Int
   alignment = cAlignment
-  poke :: Ptr TetrionSnapshot -> TetrionSnapshot -> IO ()
+  poke :: Ptr TetrionSnapshotC -> TetrionSnapshotC -> IO ()
   poke = cPoke
-  peek :: Ptr TetrionSnapshot -> IO TetrionSnapshot
+  peek :: Ptr TetrionSnapshotC -> IO TetrionSnapshotC
   peek = cPeek
 
-data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOPetrisTetrionHeader" #-} TetrionHeader = TetrionHeader
-  { seed :: CU64,
-    starting_level :: CU32
+data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOPetrisTetrionHeader" #-} TetrionHeaderC = TetrionHeaderC
+  { c_seed :: CU64,
+    c_starting_level :: CU32
   }
   deriving (Eq, Show, Generic)
 
-instance CStorable TetrionHeader
+data TetrionHeader = TetrionHeader
+  { seed :: Word64,
+    starting_level :: Word32
+  }
+  deriving (Eq, Show)
 
-instance Storable TetrionHeader where
-  sizeOf :: TetrionHeader -> Int
+instance CStorable TetrionHeaderC
+
+instance Storable TetrionHeaderC where
+  sizeOf :: TetrionHeaderC -> Int
   sizeOf = cSizeOf
-  alignment :: TetrionHeader -> Int
+  alignment :: TetrionHeaderC -> Int
   alignment = cAlignment
-  poke :: Ptr TetrionHeader -> TetrionHeader -> IO ()
+  poke :: Ptr TetrionHeaderC -> TetrionHeaderC -> IO ()
   poke = cPoke
-  peek :: Ptr TetrionHeader -> IO TetrionHeader
+  peek :: Ptr TetrionHeaderC -> IO TetrionHeaderC
   peek = cPeek
 
-data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOPetrisRecordingInformation" #-} RecordingInformation = RecordingInformation
-  { information :: Ptr AdditionalInformation,
-    records :: Ptr TetrionRecord,
-    snapshots :: Ptr TetrionSnapshot,
-    tetrion_headers :: Ptr TetrionHeader,
-    version :: CU32
+data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOPetrisRecordingInformation" #-} RecordingInformationC = RecordingInformationC
+  { c_information :: Ptr AdditionalInformationC,
+    c_records :: Ptr TetrionRecordC,
+    c_snapshots :: Ptr TetrionSnapshotC,
+    c_tetrion_headers :: Ptr TetrionHeaderC,
+    c_version :: CU32
   }
   deriving (Eq, Show, Generic)
 
-instance CStorable RecordingInformation
+data RecordingInformation = RecordingInformation
+  { information :: AdditionalInformation,
+    records :: [TetrionRecord],
+    snapshots :: [TetrionSnapshot],
+    tetrion_headers :: [TetrionHeader],
+    version :: Word32
+  }
+  deriving (Eq, Show)
 
-instance Storable RecordingInformation where
-  sizeOf :: RecordingInformation -> Int
+instance CStorable RecordingInformationC
+
+instance Storable RecordingInformationC where
+  sizeOf :: RecordingInformationC -> Int
   sizeOf = cSizeOf
-  alignment :: RecordingInformation -> Int
+  alignment :: RecordingInformationC -> Int
   alignment = cAlignment
-  poke :: Ptr RecordingInformation -> RecordingInformation -> IO ()
+  poke :: Ptr RecordingInformationC -> RecordingInformationC -> IO ()
   poke = cPoke
-  peek :: Ptr RecordingInformation -> IO RecordingInformation
+  peek :: Ptr RecordingInformationC -> IO RecordingInformationC
   peek = cPeek
 
-data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOPetrisGridProperties" #-} GridProperties = GridProperties
-  { height :: CU32,
-    width :: CU32
+data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOPetrisGridProperties" #-} GridPropertiesC = GridPropertiesC
+  { c_height :: CU32,
+    c_width :: CU32
   }
   deriving (Eq, Show, Generic)
 
-instance CStorable GridProperties
+data GridProperties = GridProperties
+  { height :: Word32,
+    width :: Word32
+  }
+  deriving (Eq, Show)
 
-instance Storable GridProperties where
-  sizeOf :: GridProperties -> Int
+instance CStorable GridPropertiesC
+
+instance Storable GridPropertiesC where
+  sizeOf :: GridPropertiesC -> Int
   sizeOf = cSizeOf
-  alignment :: GridProperties -> Int
+  alignment :: GridPropertiesC -> Int
   alignment = cAlignment
-  poke :: Ptr GridProperties -> GridProperties -> IO ()
+  poke :: Ptr GridPropertiesC -> GridPropertiesC -> IO ()
   poke = cPoke
-  peek :: Ptr GridProperties -> IO GridProperties
+  peek :: Ptr GridPropertiesC -> IO GridPropertiesC
   peek = cPeek

@@ -1,16 +1,15 @@
-module Types (AdditionalInformation, AdditionalInformationField, RecordingReturnValue, AdditionalInformationTypeAlias) where
+module Types (AdditionalInformationC, AdditionalInformationFieldC, RecordingReturnValueC, EnumTypeC) where
 
-import Foreign.Ptr (Ptr)
 import StdInt (CI32)
 
 -- opaque type
-data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOPetrisAdditionalInformation" #-} AdditionalInformation
+data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOPetrisAdditionalInformation" #-} AdditionalInformationC
 
 -- opaque type
-data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOPetrisAdditionalInformationField" #-} AdditionalInformationField
+data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOPetrisAdditionalInformationField" #-} AdditionalInformationFieldC
 
 -- opaque type
-data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOPetrisRecordingReturnValue" #-} RecordingReturnValue
+data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOPetrisRecordingReturnValue" #-} RecordingReturnValueC
 
 -- enum return type
-type AdditionalInformationTypeAlias = CI32
+type EnumTypeC = CI32
