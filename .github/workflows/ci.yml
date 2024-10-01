@@ -106,11 +106,11 @@ jobs:
       - name: Fix pkg-config (Windows)
         if: matrix.config.os == 'windows'
         run: |
-          Remove-Item -Path C:\Strawberry\ -Recurse 
+          Remove-Item -Path C:\Strawberry\ -Recurse
           choco install pkgconfiglite
           echo "PKG_CONFIG_PATH=C:/lib/pkgconfig" | Out-File -FilePath $env:GITHUB_ENV -Append
 
-      - name: Configure
+      - name: Configure OOPetris
         run: |
           cd oopetris
           meson setup build -Dbuildtype=release -Ddefault_library=static -Dclang_libcpp=${{ matrix.config.os == 'macos' && 'enabled' || 'disabled' }} -Donly_build_libs=true ${{ matrix.config.os == 'windows' && '-Db_vscrt=static_from_buildtype' || '' }}
@@ -118,16 +118,16 @@ jobs:
       - name: Build and install Libs
         if: matrix.config.os != 'ubuntu'
         run: |
-          cd oopetris 
+          cd oopetris
           meson install -C build
 
       - name: Build and install Libs (Linux)
         if: matrix.config.os == 'ubuntu'
         run: |
-          cd oopetris 
+          cd oopetris
           sudo meson install -C build
 
-      - name: BuildC Wrapper
+      - name: Build C Wrapper
         run: |
           cd oopetris_c_wrapper
           meson setup -Dtests=false -Dexample=false build -Dbuildtype=release -Ddefault_library=static
@@ -136,18 +136,18 @@ jobs:
       - name: Install C Wrapper
         if: matrix.config.os != 'ubuntu'
         run: |
-          cd oopetris_c_wrapper 
+          cd oopetris_c_wrapper
           meson install -C build
 
       - name: Build and install Libs (Linux)
         if: matrix.config.os == 'ubuntu'
         run: |
-          cd oopetris_c_wrapper 
+          cd oopetris_c_wrapper
           sudo meson install -C build
 
       - uses: haskell-actions/setup@v2
         with:
-          ghc-version: '9.6.5'
+          ghc-version: '9.6.6'
           enable-stack: true
           stack-version: 'latest'
 
