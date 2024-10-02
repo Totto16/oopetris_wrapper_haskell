@@ -1,7 +1,7 @@
 module Lib (isRecordingFile, getLibVersion, getGridProperties, getRecordingInformation, RecordingReturnValue (..)) where
 
 import qualified AdditionalInformationType as AdType
-import Data.HashMap (fromList)
+import Data.HashMap.Strict (fromList)
 import FFI (c_additional_information_field_get_bool, c_additional_information_field_get_double, c_additional_information_field_get_float, c_additional_information_field_get_i32, c_additional_information_field_get_i64, c_additional_information_field_get_i8, c_additional_information_field_get_string, c_additional_information_field_get_type, c_additional_information_field_get_u32, c_additional_information_field_get_u64, c_additional_information_field_get_u8, c_additional_information_field_get_vector, c_additional_information_get_field, c_additional_information_get_keys, c_additional_information_keys_free, c_array_len, c_free_grid_properties, c_free_recording_value_whole, c_get_error, c_get_grid_properties, c_get_information, c_get_lib_version, c_get_recording_information, c_is_error, c_is_recording_file)
 import Foreign (Storable (sizeOf), withForeignPtr)
 import Foreign.C (CChar (), CDouble (CDouble), CFloat (CFloat), withCString)

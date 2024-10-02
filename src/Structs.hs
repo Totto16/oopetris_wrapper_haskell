@@ -22,7 +22,7 @@ module Structs
   )
 where
 
-import Data.HashMap (Map)
+import Data.HashMap.Strict (HashMap)
 import Data.Int (Int32, Int64, Int8)
 import Data.Word (Word32, Word64, Word8)
 import Foreign.CStorable (CStorable (..))
@@ -51,7 +51,7 @@ data AdditionalInformationField
   | FieldVector [AdditionalInformationField]
   deriving (Eq, Show)
 
-type AdditionalInformation = Map String AdditionalInformationField
+type AdditionalInformation = HashMap String AdditionalInformationField
 
 -- | This aligns the sizeof, so that it works correctly with the library!!
 cSizeOfPatch :: (CStorable a) => a -> Int
