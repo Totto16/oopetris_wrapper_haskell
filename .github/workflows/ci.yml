@@ -68,6 +68,15 @@ jobs:
           version: 14
           platform: x64
 
+      - name: Setup GCC Environment (Linux)
+        if: matrix.config.os == 'ubuntu'
+        run: |
+          echo "CC=gcc" >> "$GITHUB_ENV"
+          echo "CXX=g++" >> "$GITHUB_ENV"
+          echo "CC_LD=gold" >> "$GITHUB_ENV"
+          echo "CXX_LD=gold" >> "$GITHUB_ENV"
+          echo "LD=gold" >> "$GITHUB_ENV"
+
       - name: Setup Clang (MacOS)
         if: matrix.config.os == 'macos'
         run: |
@@ -83,6 +92,7 @@ jobs:
           echo "CC_LD=lld" >> "$GITHUB_ENV"
           echo "CXX_LD=lld" >> "$GITHUB_ENV"
           echo "OBJC_LD=lld" >> "$GITHUB_ENV"
+          echo "LD=lld" >> "$GITHUB_ENV"
 
       - name: Setup meson (MacOS)
         if: matrix.config.os == 'macos'
