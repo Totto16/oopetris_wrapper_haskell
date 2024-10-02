@@ -164,5 +164,6 @@ jobs:
       - name: Build Wrapper
         run: |
           stack build
+          ${{ matrix.config.os != 'windows' && 'sudo ldconfig' || '' }}
           stack test
           stack run -- test/files/correct.rec
