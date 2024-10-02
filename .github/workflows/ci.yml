@@ -123,7 +123,7 @@ jobs:
       - name: Configure OOPetris
         run: |
           cd oopetris
-          meson setup build -Dbuildtype=release -Ddefault_library=static -Dclang_libcpp=${{ matrix.config.os == 'macos' && 'enabled' || 'disabled' }} -Donly_build_libs=true ${{ matrix.config.os == 'windows' && '-Db_vscrt=static_from_buildtype' || '' }}
+          meson setup build -Dbuildtype=release -Ddefault_library=shared -Dclang_libcpp=${{ matrix.config.os == 'macos' && 'enabled' || 'disabled' }} -Donly_build_libs=true ${{ matrix.config.os == 'windows' && '-Db_vscrt=static_from_buildtype' || '' }}
 
       - name: Build and install Libs
         if: matrix.config.os != 'ubuntu'
@@ -140,7 +140,7 @@ jobs:
       - name: Build C Wrapper
         run: |
           cd oopetris_c_wrapper
-          meson setup -Dtests=false -Dexample=false build -Dbuildtype=release -Ddefault_library=static
+          meson setup -Dtests=false -Dexample=false build -Dbuildtype=release -Ddefault_library=shared
           meson compile -C build
 
       - name: Install C Wrapper
