@@ -61,7 +61,7 @@ cSizeOfPatch a = if remainder == 0 then sz else (res + 1) * al
     sz = cSizeOf a
     (res, remainder) = sz `divMod` al
 
-data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOPetrisTetrionRecord" #-} TetrionRecordC = TetrionRecordC
+data {-# CTYPE "oopetris/c_wrapper/wrapper.h" "OOPetrisTetrionRecord" #-} TetrionRecordC = TetrionRecordC
   { c_r_simulation_step_index :: CU64,
     c_event :: EnumTypeC,
     c_r_tetrion_index :: CU8
@@ -87,7 +87,7 @@ instance Storable TetrionRecordC where
   peek :: Ptr TetrionRecordC -> IO TetrionRecordC
   peek = cPeek
 
-data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOpetrisMinoPosition" #-} MinoPositionC = MinoPositionC
+data {-# CTYPE "oopetris/c_wrapper/wrapper.h" "OOpetrisMinoPosition" #-} MinoPositionC = MinoPositionC
   { c_x :: CU8,
     c_y :: CU8
   }
@@ -111,7 +111,7 @@ instance Storable MinoPositionC where
   peek :: Ptr MinoPositionC -> IO MinoPositionC
   peek = cPeek
 
-data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOPetrisMino" #-} MinoC = MinoC
+data {-# CTYPE "oopetris/c_wrapper/wrapper.h" "OOPetrisMino" #-} MinoC = MinoC
   { c_position :: MinoPositionC,
     c_type :: EnumTypeC
   }
@@ -135,7 +135,7 @@ instance Storable MinoC where
   peek :: Ptr MinoC -> IO MinoC
   peek = cPeek
 
-data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOpetrisTetrionSnapshot" #-} TetrionSnapshotC = TetrionSnapshotC
+data {-# CTYPE "oopetris/c_wrapper/wrapper.h" "OOpetrisTetrionSnapshot" #-} TetrionSnapshotC = TetrionSnapshotC
   { c_level :: CU32,
     c_mino_stack :: Ptr MinoC,
     c_score :: CU64,
@@ -167,7 +167,7 @@ instance Storable TetrionSnapshotC where
   peek :: Ptr TetrionSnapshotC -> IO TetrionSnapshotC
   peek = cPeek
 
-data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOPetrisTetrionHeader" #-} TetrionHeaderC = TetrionHeaderC
+data {-# CTYPE "oopetris/c_wrapper/wrapper.h" "OOPetrisTetrionHeader" #-} TetrionHeaderC = TetrionHeaderC
   { c_seed :: CU64,
     c_starting_level :: CU32
   }
@@ -191,7 +191,7 @@ instance Storable TetrionHeaderC where
   peek :: Ptr TetrionHeaderC -> IO TetrionHeaderC
   peek = cPeek
 
-data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOPetrisRecordingInformation" #-} RecordingInformationC = RecordingInformationC
+data {-# CTYPE "oopetris/c_wrapper/wrapper.h" "OOPetrisRecordingInformation" #-} RecordingInformationC = RecordingInformationC
   { c_information :: Ptr AdditionalInformationC,
     c_records :: Ptr TetrionRecordC,
     c_snapshots :: Ptr TetrionSnapshotC,
@@ -221,7 +221,7 @@ instance Storable RecordingInformationC where
   peek :: Ptr RecordingInformationC -> IO RecordingInformationC
   peek = cPeek
 
-data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOPetrisGridProperties" #-} GridPropertiesC = GridPropertiesC
+data {-# CTYPE "oopetris/c_wrapper/wrapper.h" "OOPetrisGridProperties" #-} GridPropertiesC = GridPropertiesC
   { c_height :: CU32,
     c_width :: CU32
   }
