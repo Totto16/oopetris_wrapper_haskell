@@ -131,6 +131,7 @@ jobs:
           cd oopetris_c_wrapper
           meson setup -Dtests=false -Dexample=false build -Dbuildtype=release -Ddefault_library=shared
           ${{ matrix.config.os == 'ubuntu' && 'sudo' || '' }} meson install -C build
+          ${{ matrix.config.os == 'ubuntu' && 'sudo ldconfig' || '' }}
 
       - uses: haskell-actions/setup@v2
         with:
@@ -141,6 +142,5 @@ jobs:
       - name: Build and Test Wrapper
         run: |
           stack build
-          ${{ matrix.config.os != 'windows' && 'sudo ldconfig' || '' }}
           stack test
           stack run -- test/files/correct.rec
