@@ -2,7 +2,7 @@ name: Build CI
 
 on:
   push:
-    branches: ["main"]
+    branches: ['main']
   pull_request:
   workflow_dispatch:
 
@@ -23,7 +23,7 @@ jobs:
             os: ubuntu
             os-version: 24.04
 
-          - name: MacOS 
+          - name: MacOS
             os: macos
             os-version: 13
 
@@ -31,25 +31,24 @@ jobs:
             os: macos
             os-version: 14
 
-
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: "0"
+          fetch-depth: '0'
 
       - uses: actions/checkout@v4
-        name: Checkout OOPetris main repo  
+        name: Checkout OOPetris main repo
         with:
-          fetch-depth: "0"
+          fetch-depth: '0'
           repository: OpenBrickProtocolFoundation/oopetris
           ref: main
           path: ./oopetris
           submodules: false
-  
+
       - uses: actions/checkout@v4
         name: Checkout C Wrapper
         with:
-          fetch-depth: "0"
+          fetch-depth: '0'
           repository: Totto16/oopetris_wrapper_c
           ref: main
           path: ./oopetris_c_wrapper
@@ -69,11 +68,21 @@ jobs:
           version: 14
           platform: x64
 
+      - name: Setup GCC Environment (Linux)
+        if: matrix.config.os == 'ubuntu'
+        run: |
+          echo "CC=gcc" >> "$GITHUB_ENV"
+          echo "CXX=g++" >> "$GITHUB_ENV"
+          echo "CC_LD=gold" >> "$GITHUB_ENV"
+          echo "CXX_LD=gold" >> "$GITHUB_ENV"
+          echo "LD=gold" >> "$GITHUB_ENV"
+
       - name: Setup Clang (MacOS)
         if: matrix.config.os == 'macos'
         run: |
           brew update
-          brew install llvm@18
+          # TODO annotate with lld@19, after that is accepted, we don't want to use lld@20 without manually updating it !
+          brew install llvm@19 lld
           echo "$(brew --prefix)/opt/llvm/bin" >> $GITHUB_PATH
           echo "LDFLAGS=-L$(brew --prefix)/opt/llvm/lib -L$(brew --prefix)/opt/llvm/lib/c++ -Wl,-rpath,$(brew --prefix)/opt/llvm/lib/c++" >> "$GITHUB_ENV"
           echo "CPPFLAGS=-I$(brew --prefix)/opt/llvm/include" >> "$GITHUB_ENV"
@@ -83,13 +92,14 @@ jobs:
           echo "CC_LD=lld" >> "$GITHUB_ENV"
           echo "CXX_LD=lld" >> "$GITHUB_ENV"
           echo "OBJC_LD=lld" >> "$GITHUB_ENV"
+          echo "LD=lld" >> "$GITHUB_ENV"
 
       - name: Setup meson (MacOS)
-        if: matrix.config.os == 'macos' 
+        if: matrix.config.os == 'macos'
         run: |
           brew update
           brew install meson
-  
+
       # NOTE: meson has no dependencies, so --break-system-packages doesn't really break anything!
       - name: Setup meson
         if: matrix.config.os != 'macos'
@@ -100,60 +110,39 @@ jobs:
         if: matrix.config.os == 'ubuntu'
         run: |
           sudo apt-get update
-          sudo apt-get install ninja-build -y
+          sudo apt-get install ninja-build -y --no-install-recommends
           sudo pip install meson --break-system-packages
 
       - name: Fix pkg-config (Windows)
         if: matrix.config.os == 'windows'
         run: |
-          Remove-Item -Path C:\Strawberry\ -Recurse 
+          Remove-Item -Path C:\Strawberry\ -Recurse
           choco install pkgconfiglite
           echo "PKG_CONFIG_PATH=C:/lib/pkgconfig" | Out-File -FilePath $env:GITHUB_ENV -Append
-          
-      - name: Configure
-        run: | 
-            cd oopetris
-            meson setup build -Dbuildtype=release -Ddefault_library=static -Dclang_libcpp=${{ matrix.config.os == 'macos'  && 'enabled' || 'disabled' }}  -Donly_build_libs=true ${{ matrix.config.os == 'windows' &&  '-Db_vscrt=static_from_buildtype' || '' }} 
+          echo "C:/bin" | Out-File -FilePath $env:GITHUB_PATH -Append
 
-      - name: Build and install Libs
-        if: matrix.config.os != 'ubuntu'
-        run: |  
-          cd oopetris 
-          meson install -C build 
+      - name: Build and Install OOPetris
+        run: |
+          cd oopetris
+          meson setup build -Dbuildtype=release -Ddefault_library=shared -Dclang_libcpp=${{ matrix.config.os == 'macos' && 'enabled' || 'disabled' }} -Donly_build_libs=true ${{ matrix.config.os == 'windows' && '-Db_vscrt=from_buildtype' || '' }}
+          ${{ matrix.config.os == 'ubuntu' && 'sudo' || '' }} meson install -C build
 
-      - name: Build and install Libs (Linux)
-        if: matrix.config.os == 'ubuntu'
-        run: |  
-          cd oopetris 
-          sudo meson install -C build 
-
-      - name: Build  C Wrapper
-        run: | 
+      - name: Build and Install C Wrapper
+        run: |
           cd oopetris_c_wrapper
-          meson setup -Dtests=false -Dexample=false build -Dbuildtype=release -Ddefault_library=static
-          meson compile -C build
-     
-
-      - name: Install C Wrapper
-        if: matrix.config.os != 'ubuntu'
-        run: |  
-          cd oopetris_c_wrapper 
-          meson install -C build 
-
-      - name: Build and install Libs (Linux)
-        if: matrix.config.os == 'ubuntu'
-        run: |  
-          cd oopetris_c_wrapper 
-          sudo meson install -C build 
+          meson setup -Dtests=false -Dexample=false build -Dbuildtype=release -Ddefault_library=shared
+          ${{ matrix.config.os == 'ubuntu' && 'sudo' || '' }} meson install -C build
+          ${{ matrix.config.os == 'ubuntu' && 'sudo ldconfig' || '' }}
 
       - uses: haskell-actions/setup@v2
         with:
-          ghc-version: '9.6.5'
+          ghc-version: '9.6.6'
           enable-stack: true
           stack-version: 'latest'
 
-      - name: Build Wrapper
-        run: | 
+      - name: Build and Test Wrapper
+        run: |
           stack build
           stack test
           stack run -- test/files/correct.rec
+          

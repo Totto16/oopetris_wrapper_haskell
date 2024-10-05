@@ -3,13 +3,13 @@ module Types (AdditionalInformationC, AdditionalInformationFieldC, RecordingRetu
 import StdInt (CI32)
 
 -- opaque type
-data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOPetrisAdditionalInformation" #-} AdditionalInformationC
+data {-# CTYPE "oopetris/c_wrapper/wrapper.h" "OOPetrisAdditionalInformation" #-} AdditionalInformationC
 
 -- opaque type
-data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOPetrisAdditionalInformationField" #-} AdditionalInformationFieldC
+data {-# CTYPE "oopetris/c_wrapper/wrapper.h" "OOPetrisAdditionalInformationField" #-} AdditionalInformationFieldC
 
 -- opaque type
-data {-# CTYPE "oopetris/oopetris_wrapper.h" "OOPetrisRecordingReturnValue" #-} RecordingReturnValueC
+data {-# CTYPE "oopetris/c_wrapper/wrapper.h" "OOPetrisRecordingReturnValue" #-} RecordingReturnValueC
 
 -- enum return type
 type EnumTypeC = CI32
