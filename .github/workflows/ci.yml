@@ -133,6 +133,15 @@ jobs:
           ${{ matrix.config.os == 'ubuntu' && 'sudo' || '' }} meson install -C build
           ${{ matrix.config.os == 'ubuntu' && 'sudo ldconfig' || '' }}
 
+      - name: Copy shared libraries to the correct place 
+        if: matrix.config.os == 'windows'
+        run: |
+          Copy-Item -Path ".\oopetris\build\src\libs\core\oopetris_core-0.dll" -Destination .
+          Copy-Item -Path ".\oopetris\build\src\libs\recordings\oopetris_recordings-0.dll" -Destination .
+          Copy-Item -Path ".\oopetris\build\subprojects\fmt-11.0.2\fmt.dll" -Destination .
+          Copy-Item -Path ".\oopetris_c_wrapper\build\oopetris_c_wrapper-0.dll" -Destination .
+          
+
       - uses: haskell-actions/setup@v2
         with:
           ghc-version: '9.6.6'
@@ -144,3 +153,5 @@ jobs:
           stack build
           stack test
           stack run -- test/files/correct.rec
+          Copy-Item ./ooopetris/build/src/libs/recordings/oopetris_recordings-0.dll -Destination . 
+          
