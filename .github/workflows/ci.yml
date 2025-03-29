@@ -6,6 +6,10 @@ on:
   pull_request:
   workflow_dispatch:
 
+env:
+  oopetris_main_repo_ref: 01236ab59b27e7a8889e48c73ec0361cf2206805
+  oopetris_c_repo_ref: 76814135f854a1124918dcc0fd34d36e316c4571
+
 jobs:
   build:
     name: ${{ matrix.config.name }}
@@ -41,7 +45,7 @@ jobs:
         with:
           fetch-depth: '0'
           repository: OpenBrickProtocolFoundation/oopetris
-          ref: main
+          ref: ${{ env.oopetris_main_repo_ref }}
           path: ./oopetris
           submodules: false
 
@@ -50,7 +54,7 @@ jobs:
         with:
           fetch-depth: '0'
           repository: Totto16/oopetris_wrapper_c
-          ref: main
+          ref: ${{ env.oopetris_c_repo_ref }}
           path: ./oopetris_c_wrapper
           submodules: false
 
