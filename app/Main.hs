@@ -6,11 +6,8 @@ import System.Environment (getArgs)
 main :: IO ()
 main = do
   args <- getArgs
-  if length args /= 1
-    then do
-      putStrLn "Usage: <file>"
-    else do
-      let file = head args
+  case args of
+    [file] -> do
       isRecFile <- isRecordingFile file
       if not isRecFile
         then do
@@ -21,3 +18,4 @@ main = do
             RecordingReturnError err -> putStrLn $ "An error occurred: " ++ err
             RecordingReturnSuccess information -> print information
           return ()
+    _ -> putStrLn "Usage: <file>"

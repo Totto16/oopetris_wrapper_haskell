@@ -2,7 +2,7 @@ name: oopetris-haskell-wrapper
 version: 0.1.0.0
 license: MIT
 author: "Totto16"
-copyright: "2024 Totto16"
+copyright: "2024-2025 Totto16"
 
 extra-source-files:
     - README.md
